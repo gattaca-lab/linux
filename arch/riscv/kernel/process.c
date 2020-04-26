@@ -21,6 +21,7 @@
 #include <asm/string.h>
 #include <asm/switch_to.h>
 #include <asm/thread_info.h>
+#include <linux/prctl.h>
 
 #define STR(x) #x
 #define XSTR(s) STR(s)
@@ -130,5 +131,25 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long usp,
 		p->thread.ra = (unsigned long)ret_from_fork;
 	}
 	p->thread.sp = (unsigned long)childregs; /* kernel sp */
+	return 0;
+}
+
+long set_tagged_addr_ctrl(unsigned long arg) {
+	uint64_t new_mode = arg & PR_TAGGED_ADDR_ENABLE;
+	// TODO: Add more more checks (syctl restricions and add flags)
+	current->thread.tbi = (new_mode) ? TBICONTROL_TAE : 0;
+	__asm__  volatile ("csrrw   zero, " XSTR(CSR_TBICONTROL) ", %[new_mode];\n"
+		:
+		: [new_mode] "r" (new_mode)
+		: "memory");
+
+	return 0;
+}
+
+long get_tagged_addr_ctrl(void) {
+
+	if (current->thread.tbi)
+		return PR_TAGGED_ADDR_ENABLE;
+
 	return 0;
 }
