@@ -27,10 +27,9 @@ Register: CSR_TBICONTROL (0x9c0)
 If CSR_TBICONTROL.TBI_ENABLE is set to one, then for all memory references
 bits [63:56] of the resulting address ignored.
 
-*NOTE:* to simplify the design we assume that this property is true only
-for memory references which have bits [55:39] set to zero, that is TBI
-should be enabled only for "user-space" addresses. This restriction is
-just to simplify the required support from OS.
+*NOTE:* to simplify the design of a relevant OS subsystem(s), we assume that
+TBI is active only for memory references which have bits [55:39] set to zero,
+that is TBI should affect only for "user-space" addresses.
 
 Implementation
 --------------
