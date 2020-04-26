@@ -22,6 +22,9 @@
 #include <asm/switch_to.h>
 #include <asm/thread_info.h>
 
+#define STR(x) #x
+#define XSTR(s) STR(s)
+
 extern asmlinkage void ret_from_fork(void);
 extern asmlinkage void ret_from_kernel_thread(void);
 
@@ -77,6 +80,7 @@ void start_thread(struct pt_regs *regs, unsigned long pc,
 	regs->epc = pc;
 	regs->sp = sp;
 	set_fs(USER_DS);
+        __asm__ ("csrw " XSTR(CSR_TBICONTROL) ", zero;");
 }
 
 void flush_thread(void)
