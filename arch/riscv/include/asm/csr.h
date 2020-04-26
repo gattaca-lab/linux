@@ -47,6 +47,8 @@
 #define SATP_MODE	SATP_MODE_39
 #endif
 
+#define TBICONTROL_TAE  _AC(0x00000001, UL) /* Tagged address enable bit in TBI control csr */
+
 /* Exception cause high bit - is an interrupt if set */
 #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
 
@@ -101,6 +103,9 @@
 #define CSR_MTVAL		0x343
 #define CSR_MIP			0x344
 #define CSR_MHARTID		0xf14
+
+/* Custom csr for TBI feature */
+#define CSR_TBICONTROL          0x9c0
 
 #ifdef CONFIG_RISCV_M_MODE
 # define CSR_STATUS	CSR_MSTATUS
