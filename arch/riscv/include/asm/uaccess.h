@@ -17,6 +17,7 @@
 #include <linux/thread_info.h>
 #include <asm/byteorder.h>
 #include <asm/extable.h>
+#include <asm/pgtable.h>
 #include <asm/asm.h>
 
 #define __enable_user_access()							\
@@ -66,7 +67,6 @@ static inline void set_fs(mm_segment_t fs)
  * this function, memory access functions may still return -EFAULT.
  */
 #define access_ok(addr, size) ({					\
-	__chk_user_ptr(addr);						\
 	likely(__access_ok((unsigned long __force)(addr), (size)));	\
 })
 
@@ -77,6 +77,13 @@ static inline void set_fs(mm_segment_t fs)
 static inline int __access_ok(unsigned long addr, unsigned long size)
 {
 	const mm_segment_t fs = get_fs();
+  // TODO: add appropriate define
+	if (IS_ENABLED(1) &&
+		((current->flags & PF_KTHREAD) ||
+			(current->thread.tbi /*TODO: maybe introduce a flag here*/)))
+		addr = untagged_addr(addr);
+
+	__chk_user_ptr(addr);
 
 	return size <= fs.seg && addr <= fs.seg - size;
 }

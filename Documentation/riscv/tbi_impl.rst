@@ -61,7 +61,6 @@ Limitations
 
 Our current implementation has several restrictions (all are WIP):
 
-* Passing of tagged pointers to syscalls is not supported.
 * sysctl - based interface to forbid enabling of TBI is not supported.
 * CSR_TBICONTROL.TBI_ENABLE should not affect "kernel" addresses (the ones
 which have all bits from [55:39] range set).
