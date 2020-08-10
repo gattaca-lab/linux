@@ -381,9 +381,13 @@ ENTRY(__switch_to)
 	add   a4, a1, a4
 	REG_S ra,  TASK_THREAD_RA_RA(a3)
 
-        /* store TBI register */
-	csrr a5, CSR_TBICONTROL
-	REG_S a5,  TASK_THREAD_TBI_RA(a3)
+        /* store PM registers */
+	csrr a5, CSR_UMTE
+	REG_S a5,  TASK_THREAD_UMTE_RA(a3)
+	csrr a5, CSR_UPMMASK
+	REG_S a5,  TASK_THREAD_UPMMASK_RA(a3)
+	csrr a5, CSR_UPMBASE
+	REG_S a5,  TASK_THREAD_UPMBASE_RA(a3)
 
 	REG_S sp,  TASK_THREAD_SP_RA(a3)
 	REG_S s0,  TASK_THREAD_S0_RA(a3)
@@ -401,9 +405,13 @@ ENTRY(__switch_to)
 	/* Restore context from next->thread */
 	REG_L ra,  TASK_THREAD_RA_RA(a4)
 
-        /* restore tbi register */
-	REG_L a5,  TASK_THREAD_TBI_RA(a4)
-	csrw CSR_TBICONTROL, a5
+        /* restorePM registers */
+	REG_L a5,  TASK_THREAD_UMTE_RA(a4)
+	csrw CSR_UMTE, a5
+	REG_L a5,  TASK_THREAD_UPMMASK_RA(a4)
+	csrw CSR_UPMMASK, a5
+	REG_L a5,  TASK_THREAD_UPMBASE_RA(a4)
+	csrw CSR_UPMBASE, a5
 
 	REG_L sp,  TASK_THREAD_SP_RA(a4)
 	REG_L s0,  TASK_THREAD_S0_RA(a4)

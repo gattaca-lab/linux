@@ -81,7 +81,15 @@ void start_thread(struct pt_regs *regs, unsigned long pc,
 	regs->epc = pc;
 	regs->sp = sp;
 	set_fs(USER_DS);
-        __asm__ ("csrw " XSTR(CSR_TBICONTROL) ", zero;");
+        /* */
+        __asm__ ("csrw " XSTR(CSR_UPMMASK) ", zero;");
+        __asm__ ("csrw " XSTR(CSR_UPMBASE) ", zero;");
+        // Enable PM Current at thread start
+	uint64_t umte_current = UMTE_PM_CURRENT;
+	__asm__  volatile ("csrw " XSTR(CSR_UMTE) ", %[umte_current];\n"
+		:
+		: [umte_current] "r" (umte_current)
+		: "memory");
 }
 
 void flush_thread(void)
@@ -137,8 +145,8 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long usp,
 long set_tagged_addr_ctrl(unsigned long arg) {
 	uint64_t new_mode = arg & PR_TAGGED_ADDR_ENABLE;
 	// TODO: Add more more checks (syctl restricions and add flags)
-	current->thread.tbi = (new_mode) ? TBICONTROL_TAE : 0;
-	__asm__  volatile ("csrrw   zero, " XSTR(CSR_TBICONTROL) ", %[new_mode];\n"
+	current->thread.umte |= (new_mode) ? UMTE_PM_ENABLE : 0;
+	__asm__  volatile ("csrrw   zero, " XSTR(CSR_UMTE) ", %[new_mode];\n"
 		:
 		: [new_mode] "r" (new_mode)
 		: "memory");
@@ -148,7 +156,7 @@ long set_tagged_addr_ctrl(unsigned long arg) {
 
 long get_tagged_addr_ctrl(void) {
 
-	if (current->thread.tbi)
+	if (current->thread.umte & UMTE_PM_ENABLE)
 		return PR_TAGGED_ADDR_ENABLE;
 
 	return 0;

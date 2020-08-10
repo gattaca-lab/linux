@@ -47,7 +47,8 @@
 #define SATP_MODE	SATP_MODE_39
 #endif
 
-#define TBICONTROL_TAE  _AC(0x00000001, UL) /* Tagged address enable bit in TBI control csr */
+#define UMTE_PM_ENABLE  _AC(0x00000001, UL) /* Bit to enable pointer masking */
+#define UMTE_PM_CURRENT _AC(0x00000002, UL) /* Bit to allow to modify PM registers on same priv level */
 
 /* Exception cause high bit - is an interrupt if set */
 #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
@@ -105,7 +106,9 @@
 #define CSR_MHARTID		0xf14
 
 /* Custom csr for TBI feature */
-#define CSR_TBICONTROL          0x9c0
+#define CSR_UMTE                0x8c0
+#define CSR_UPMMASK             0x8c1
+#define CSR_UPMBASE             0x8c2
 
 #ifdef CONFIG_RISCV_M_MODE
 # define CSR_STATUS	CSR_MSTATUS

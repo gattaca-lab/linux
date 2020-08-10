@@ -78,13 +78,10 @@ static inline unsigned long _pmd_pfn(pmd_t pmd)
 #define pmd_ERROR(e) \
 	pr_err("%s:%d: bad pmd %016lx.\n", __FILE__, __LINE__, pmd_val(e))
 
-// TODO: add check #ifdef CONFIG_RISCV_ENABLE_TBI
-#define __untagged_addr(addr)	\
-	((__force __typeof__(addr))sign_extend64((__force u64)(addr), 55))
-
-#define untagged_addr(addr)	({					\
+#define untagged_addr(addr)({						\
 	u64 __addr = (__force u64)addr;					\
-	__addr &= __untagged_addr(__addr);				\
+        u64 __mask = (__force u64)csr_read(CSR_UPMMASK);		\
+	__addr &= ~__mask;						\
 	(__force __typeof__(addr))__addr;				\
 })
 

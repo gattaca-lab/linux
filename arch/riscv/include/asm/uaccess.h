@@ -80,8 +80,9 @@ static inline int __access_ok(unsigned long addr, unsigned long size)
   // TODO: add appropriate define
 	if (IS_ENABLED(1) &&
 		((current->flags & PF_KTHREAD) ||
-			(current->thread.tbi /*TODO: maybe introduce a flag here*/)))
+			(current->thread.umte & UMTE_PM_ENABLE /*TODO: maybe introduce a flag here*/))) {
 		addr = untagged_addr(addr);
+        }
 
 	__chk_user_ptr(addr);
 

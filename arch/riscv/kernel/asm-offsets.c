@@ -14,7 +14,9 @@
 void asm_offsets(void)
 {
 	OFFSET(TASK_THREAD_RA, task_struct, thread.ra);
-	OFFSET(TASK_THREAD_TBI, task_struct, thread.tbi);
+	OFFSET(TASK_THREAD_UMTE, task_struct, thread.umte);
+	OFFSET(TASK_THREAD_UPMMASK, task_struct, thread.upmmask);
+	OFFSET(TASK_THREAD_UPMBASE, task_struct, thread.upmbase);
 	OFFSET(TASK_THREAD_SP, task_struct, thread.sp);
 	OFFSET(TASK_THREAD_S0, task_struct, thread.s[0]);
 	OFFSET(TASK_THREAD_S1, task_struct, thread.s[1]);
@@ -119,8 +121,16 @@ void asm_offsets(void)
 		  offsetof(struct task_struct, thread.ra)
 		- offsetof(struct task_struct, thread.ra)
 	);
-	DEFINE(TASK_THREAD_TBI_RA,
-		  offsetof(struct task_struct, thread.tbi)
+	DEFINE(TASK_THREAD_UMTE_RA,
+		  offsetof(struct task_struct, thread.umte)
+		- offsetof(struct task_struct, thread.ra)
+	);
+	DEFINE(TASK_THREAD_UPMMASK_RA,
+		  offsetof(struct task_struct, thread.upmmask)
+		- offsetof(struct task_struct, thread.ra)
+	);
+	DEFINE(TASK_THREAD_UPMBASE_RA,
+		  offsetof(struct task_struct, thread.upmbase)
 		- offsetof(struct task_struct, thread.ra)
 	);
 	DEFINE(TASK_THREAD_SP_RA,
