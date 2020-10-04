@@ -21,6 +21,7 @@
 #include <asm/string.h>
 #include <asm/switch_to.h>
 #include <asm/thread_info.h>
+#include <linux/prctl.h>
 
 #define STR(x) #x
 #define XSTR(s) STR(s)
@@ -134,5 +135,32 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long usp,
 		p->thread.ra = (unsigned long)ret_from_fork;
 	}
 	p->thread.sp = (unsigned long)childregs; /* kernel sp */
+	return 0;
+}
+
+long set_tagged_addr_ctrl(unsigned long arg) {
+	uint64_t mask;
+	uint64_t new_mode = arg & PR_TAGGED_ADDR_ENABLE;
+	// TODO: Add more more checks (syctl restricions and add flags)
+	// Set UMTE register: enable PM and set PM.Current to true
+	current->thread.pm_umte = (new_mode) ? (PM_ENABLE | PM_CURRENT) : 0;
+	__asm__ volatile ("csrrw   zero, " XSTR(CSR_UMTE) ", %[new_mode];\n"
+		:
+		: [new_mode] "r" (current->thread.pm_umte)
+		: "memory");
+	// Set UPMBASE: by default base is 0
+	__asm__ volatile ("csrw " XSTR(CSR_UPMBASE) ", zero;");
+	// Set UPMMASK: by default we'd like to mask top 8 bits
+	mask = (new_mode) ? (0xFFULL << 56) : 0;
+	__asm__ volatile ("csrrw   zero, " XSTR(CSR_UPMMASK) ", %[new_mask];\n"
+		:
+		: [new_mask] "r" (mask)
+		: "memory");
+	return 0;
+}
+
+long get_tagged_addr_ctrl(void) {
+	if (current->thread.pm_umte & PM_ENABLE)
+		return PR_TAGGED_ADDR_ENABLE;
 	return 0;
 }
