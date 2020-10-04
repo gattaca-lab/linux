@@ -8,6 +8,9 @@
 #ifndef _ASM_RISCV_UACCESS_H
 #define _ASM_RISCV_UACCESS_H
 
+#define STR(x) #x
+#define XSTR(s) STR(s)
+
 /*
  * User space memory access functions
  */
@@ -84,7 +87,6 @@ static inline void set_fs(mm_segment_t fs)
  * this function, memory access functions may still return -EFAULT.
  */
 #define access_ok(addr, size) ({					\
-	__chk_user_ptr(addr);						\
 	likely(__access_ok((unsigned long __force)(addr), (size)));	\
 })
 
@@ -95,6 +97,16 @@ static inline void set_fs(mm_segment_t fs)
 static inline int __access_ok(unsigned long addr, unsigned long size)
 {
 	const mm_segment_t fs = get_fs();
+
+	// TODO: add appropriate define
+	if (IS_ENABLED(1) &&
+		((current->flags & PF_KTHREAD) || ((current->thread.pm_umte & PM_ENABLE))))
+	{
+		unsigned long mask;
+		__asm__ ("csrr %0, " XSTR(CSR_UPMMASK) " ;" : "=r"(mask));
+		addr = addr & ~mask;
+	}
+	__chk_user_ptr(addr);
 
 	return size <= fs.seg && addr <= fs.seg - size;
 }
