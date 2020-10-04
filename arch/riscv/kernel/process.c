@@ -22,6 +22,9 @@
 #include <asm/switch_to.h>
 #include <asm/thread_info.h>
 
+#define STR(x) #x
+#define XSTR(s) STR(s)
+
 register unsigned long gp_in_global __asm__("gp");
 
 extern asmlinkage void ret_from_fork(void);
@@ -79,6 +82,10 @@ void start_thread(struct pt_regs *regs, unsigned long pc,
 	regs->epc = pc;
 	regs->sp = sp;
 	set_fs(USER_DS);
+	__asm__ ("csrw " XSTR(CSR_UMTE) ", zero;");
+	__asm__ ("csrw " XSTR(CSR_UPMBASE) ", zero;");
+	__asm__ ("csrw " XSTR(CSR_UPMMASK) ", zero;");
+
 }
 
 void flush_thread(void)
