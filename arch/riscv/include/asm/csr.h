@@ -116,8 +116,8 @@
 #define CSR_UPMMASK         0x8c1                                                                   
 #define CSR_UPMBASE         0x8c2
 
-#define PM_ENABLE  _AC(0x00000001, UL) /* Enable pointer masking bit in UMTE csr */
-#define PM_CURRENT _AC(0x00000002, UL) /* Controls ability to change PM CRSs */
+#define PM_ENABLE  _AC(0x00000004, UL) /* Enable pointer masking bit in UMTE csr */
+#define PM_CURRENT _AC(0x00000008, UL) /* Controls ability to change PM CRSs */
 
 #ifdef CONFIG_RISCV_M_MODE
 # define CSR_STATUS	CSR_MSTATUS
