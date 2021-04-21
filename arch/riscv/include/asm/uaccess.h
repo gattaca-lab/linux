@@ -39,6 +39,7 @@ raw_copy_to_user(void __user *to, const void *from, unsigned long n)
 #include <asm/byteorder.h>
 #include <asm/extable.h>
 #include <asm/asm.h>
+#include <asm/pgtable.h>
 
 #define __enable_user_access()							\
 	__asm__ __volatile__ ("csrs sstatus, %0" : : "r" (SR_SUM) : "memory")
@@ -102,12 +103,9 @@ static inline int __access_ok(unsigned long addr, unsigned long size)
 	if (IS_ENABLED(1) &&
 		((current->flags & PF_KTHREAD) || ((current->thread.pm_umte & PM_ENABLE))))
 	{
-		unsigned long mask;
-		__asm__ ("csrr %0, " XSTR(CSR_UPMMASK) " ;" : "=r"(mask));
-		addr = addr & ~mask;
+		addr = untagged_addr(addr);
 	}
 	__chk_user_ptr(addr);
-
 	return size <= fs.seg && addr <= fs.seg - size;
 }
 
