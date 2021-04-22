@@ -7,7 +7,6 @@
 #define _ASM_RISCV_PGTABLE_64_H
 
 #include <linux/const.h>
-#include <asm/csr.h>
 
 #define PGDIR_SHIFT     30
 /* Size of region mapped by a page global directory */
@@ -82,10 +81,12 @@ static inline unsigned long _pmd_pfn(pmd_t pmd)
 }
 
 // TODO: add check #ifdef CONFIG_RISCV_ENABLE_TBI
+#define __untagged_addr(addr)   \
+    ((__force __typeof__(addr))sign_extend64((__force u64)(addr), 55))
 
 #define untagged_addr(addr) ({                  \
                              u64 __addr = (__force u64)addr;                 \
-                             __addr &= ~csr_read(CSR_UPMMASK);               \
+                             __addr &= __untagged_addr(__addr);              \
                              (__force __typeof__(addr))__addr;               \
                              })
 
