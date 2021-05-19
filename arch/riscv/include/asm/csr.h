@@ -112,9 +112,9 @@
 #define CSR_MHARTID		0xf14
 
 /* Pointer masking CSRs */
-#define CSR_UMTE            0x8c0                                                                   
-#define CSR_UPMMASK         0x8c1                                                                   
-#define CSR_UPMBASE         0x8c2
+#define CSR_UMTE            0x4c0
+#define CSR_UPMMASK         0x4c1
+#define CSR_UPMBASE         0x4c2
 
 #define PM_ENABLE  _AC(0x00000004, UL) /* Enable pointer masking bit in UMTE csr */
 #define PM_CURRENT _AC(0x00000008, UL) /* Controls ability to change PM CRSs */
