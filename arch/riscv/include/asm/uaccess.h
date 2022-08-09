@@ -14,6 +14,7 @@
 /*
  * User space memory access functions
  */
+#include <asm/pgtable.h>
 
 extern unsigned long __must_check __asm_copy_to_user(void __user *to,
 	const void *from, unsigned long n);
@@ -23,13 +24,13 @@ extern unsigned long __must_check __asm_copy_from_user(void *to,
 static inline unsigned long
 raw_copy_from_user(void *to, const void __user *from, unsigned long n)
 {
-	return __asm_copy_from_user(to, from, n);
+	return __asm_copy_from_user(untagged_addr(to), untagged_addr(from), n);
 }
 
 static inline unsigned long
 raw_copy_to_user(void __user *to, const void *from, unsigned long n)
 {
-	return __asm_copy_to_user(to, from, n);
+	return __asm_copy_to_user(untagged_addr(to), untagged_addr(from), n);
 }
 
 #ifdef CONFIG_MMU
@@ -39,7 +40,6 @@ raw_copy_to_user(void __user *to, const void *from, unsigned long n)
 #include <asm/byteorder.h>
 #include <asm/extable.h>
 #include <asm/asm.h>
-#include <asm/pgtable.h>
 
 #define __enable_user_access()							\
 	__asm__ __volatile__ ("csrs sstatus, %0" : : "r" (SR_SUM) : "memory")
@@ -220,7 +220,7 @@ do {								\
 #define __get_user(x, ptr)					\
 ({								\
 	register long __gu_err = 0;				\
-	const __typeof__(*(ptr)) __user *__gu_ptr = (ptr);	\
+	const __typeof__(*(ptr)) __user *__gu_ptr = untagged_addr(ptr);	\
 	__chk_user_ptr(__gu_ptr);				\
 	switch (sizeof(*__gu_ptr)) {				\
 	case 1:							\
@@ -347,9 +347,9 @@ do {								\
  * Returns zero on success, or -EFAULT on error.
  */
 #define __put_user(x, ptr)					\
-({								\
+({                                                              \
 	register long __pu_err = 0;				\
-	__typeof__(*(ptr)) __user *__gu_ptr = (ptr);		\
+	__typeof__(*(ptr)) __user *__gu_ptr = untagged_addr(ptr);		\
 	__chk_user_ptr(__gu_ptr);				\
 	switch (sizeof(*__gu_ptr)) {				\
 	case 1:							\
