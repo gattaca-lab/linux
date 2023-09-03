@@ -207,3 +207,19 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	p->thread.sp = (unsigned long)childregs; /* kernel sp */
 	return 0;
 }
+
+long set_tagged_addr_ctrl(unsigned long arg) {
+       uint64_t new_mode = arg & PR_TAGGED_ADDR_ENABLE;
+	   if (new_mode) {
+			csr_set(CSR_SENVCFG, ENVCFG_PMEN);
+	   } else {
+			csr_clear(CSR_SENVCFG, ENVCFG_PMEN);
+	   }
+       return 0;
+}
+
+long get_tagged_addr_ctrl(void) {
+       if (csr_read(CSR_SENVCFG) & ENVCFG_PMEN)
+               return PR_TAGGED_ADDR_ENABLE;
+       return 0;
+}
