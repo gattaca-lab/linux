@@ -189,9 +189,16 @@
 #define HVICTL_IPRIOM		BIT(8)
 #define HVICTL_IPRIO		GENMASK(7, 0)
 
+/* ENVCFG_PMM values */
+#define ENVCFG_PMM_DISABLED	_AC(0x0, UL)
+#define ENVCFG_PMM_RESERVED	_AC(0x1, UL)
+#define ENVCFG_PMM_PMLEN_7	_AC(0x2, UL)
+#define ENVCFG_PMM_PMLEN_16	_AC(0x3, UL)
+
 /* xENVCFG flags */
 #define ENVCFG_STCE			(_AC(1, ULL) << 63)
 #define ENVCFG_PBMTE			(_AC(1, ULL) << 62)
+#define ENVCFG_PMM			(_AC(3, ULL) << 32)
 #define ENVCFG_CBZE			(_AC(1, UL) << 7)
 #define ENVCFG_CBCFE			(_AC(1, UL) << 6)
 #define ENVCFG_CBIE_SHIFT		4
@@ -273,6 +280,7 @@
 #define CSR_SIE			0x104
 #define CSR_STVEC		0x105
 #define CSR_SCOUNTEREN		0x106
+#define CSR_SENVCFG		0x10A
 #define CSR_SSCRATCH		0x140
 #define CSR_SEPC		0x141
 #define CSR_SCAUSE		0x142
