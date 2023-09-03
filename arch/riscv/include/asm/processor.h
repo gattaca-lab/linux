@@ -134,6 +134,11 @@ extern long riscv_v_vstate_ctrl_set_current(unsigned long arg);
 extern long riscv_v_vstate_ctrl_get_current(void);
 #endif /* CONFIG_RISCV_ISA_V */
 
+long set_tagged_addr_ctrl(unsigned long arg, unsigned long pmlen);
+long get_tagged_addr_ctrl(void);
+#define SET_TAGGED_ADDR_CTRL(arg, arg1)      set_tagged_addr_ctrl(arg, arg1)
+#define GET_TAGGED_ADDR_CTRL()         get_tagged_addr_ctrl()
+
 #endif /* __ASSEMBLY__ */
 
 #endif /* _ASM_RISCV_PROCESSOR_H */

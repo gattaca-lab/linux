@@ -2639,9 +2639,15 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 		error = PAC_GET_ENABLED_KEYS(me);
 		break;
 	case PR_SET_TAGGED_ADDR_CTRL:
+#ifdef CONFIG_RISCV
+		if (arg4 || arg5)
+			return -EINVAL;
+		error = SET_TAGGED_ADDR_CTRL(arg2, arg3);
+#else
 		if (arg3 || arg4 || arg5)
 			return -EINVAL;
 		error = SET_TAGGED_ADDR_CTRL(arg2);
+#endif
 		break;
 	case PR_GET_TAGGED_ADDR_CTRL:
 		if (arg2 || arg3 || arg4 || arg5)

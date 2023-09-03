@@ -207,3 +207,31 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	p->thread.sp = (unsigned long)childregs; /* kernel sp */
 	return 0;
 }
+
+long set_tagged_addr_ctrl(unsigned long arg, unsigned long pmlen) {
+    printk("!!Set tagged addr: arg %ld pmlen %ld\n", arg, pmlen);
+    uint64_t pm_enable = arg & PR_TAGGED_ADDR_ENABLE;
+    if (!pm_enable) {
+	csr_clear(CSR_SENVCFG, ENVCFG_PMM);
+	return 0;
+    }
+
+    if ((pmlen != ENVCFG_PMM_PMLEN_7) &&
+        (pmlen != ENVCFG_PMM_PMLEN_16)) {
+	return 0;
+    }
+    csr_set(CSR_SENVCFG, pmlen << 32);
+    unsigned long r = csr_read(CSR_SENVCFG);
+    printk("\tTagged senvcfg val %lx / pmm val %llx\n", r, r & ENVCFG_PMM);
+    return 0;
+}
+
+long get_tagged_addr_ctrl(void) {
+    unsigned long r = csr_read(CSR_SENVCFG);
+    printk("!!Get tagged addr: senvcfg val %lx", r);
+    unsigned long pmm = (r & ENVCFG_PMM) >> 32;
+    if ((pmm == ENVCFG_PMM_PMLEN_7) ||
+	(pmm == ENVCFG_PMM_PMLEN_16))
+	return PR_TAGGED_ADDR_ENABLE;
+    return 0;
+}
