@@ -9,6 +9,7 @@
 #include <linux/bits.h>
 #include <linux/const.h>
 #include <asm/errata_list.h>
+#include <asm/csr.h>
 
 extern bool pgtable_l4_enabled;
 extern bool pgtable_l5_enabled;
@@ -407,5 +408,22 @@ static inline p4d_t *p4d_offset(pgd_t *pgd, unsigned long address)
 
 	return (p4d_t *)pgd;
 }
+
+#define __untagged_addr(addr)	\
+	switch ((csr_read(CSR_SENVCFG) & ENVCFG_PMM) >> 32) { \
+	case ENVCFG_PMM_PMLEN_7: \
+	addr &= ((__force __typeof__(addr))sign_extend64((__force u64)(addr), 56)); \
+	break; \
+	case ENVCFG_PMM_PMLEN_16: \
+	addr &= ((__force __typeof__(addr))sign_extend64((__force u64)(addr), 47)); \
+	break; \
+	default: \
+	addr &= addr; } \
+
+#define untagged_addr(addr)	({					\
+	u64 __addr = (__force u64)(addr);					\
+	__untagged_addr(__addr);				\
+	(__force __typeof__(addr))__addr;				\
+})
 
 #endif /* _ASM_RISCV_PGTABLE_64_H */

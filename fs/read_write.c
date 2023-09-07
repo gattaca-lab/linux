@@ -449,6 +449,7 @@ EXPORT_SYMBOL(kernel_read);
 
 ssize_t vfs_read(struct file *file, char __user *buf, size_t count, loff_t *pos)
 {
+	buf = (char __user *)(untagged_addr((unsigned long)buf));
 	ssize_t ret;
 
 	if (!(file->f_mode & FMODE_READ))
@@ -563,6 +564,7 @@ EXPORT_SYMBOL(kernel_write);
 
 ssize_t vfs_write(struct file *file, const char __user *buf, size_t count, loff_t *pos)
 {
+	buf = (char __user *)(untagged_addr((unsigned long)buf));
 	ssize_t ret;
 
 	if (!(file->f_mode & FMODE_WRITE))

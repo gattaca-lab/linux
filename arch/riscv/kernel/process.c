@@ -25,6 +25,7 @@
 #include <asm/thread_info.h>
 #include <asm/cpuidle.h>
 #include <asm/vector.h>
+#include <linux/prctl.h>
 
 register unsigned long gp_in_global __asm__("gp");
 
