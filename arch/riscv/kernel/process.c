@@ -25,6 +25,7 @@
 #include <asm/thread_info.h>
 #include <asm/cpuidle.h>
 #include <asm/vector.h>
+#include <linux/prctl.h>
 
 register unsigned long gp_in_global __asm__("gp");
 
@@ -209,17 +210,23 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 }
 
 long set_tagged_addr_ctrl(unsigned long arg) {
+       printk("!!Set tagged addr!!\n");
        uint64_t new_mode = arg & PR_TAGGED_ADDR_ENABLE;
 	   if (new_mode) {
 			csr_set(CSR_SENVCFG, ENVCFG_PMEN);
 	   } else {
 			csr_clear(CSR_SENVCFG, ENVCFG_PMEN);
 	   }
+       unsigned long r = csr_read(CSR_SENVCFG);
+       printk("Set tagged addr %d: csr val %lx", arg, r);
        return 0;
 }
 
 long get_tagged_addr_ctrl(void) {
-       if (csr_read(CSR_SENVCFG) & ENVCFG_PMEN)
+       unsigned long r = csr_read(CSR_SENVCFG);
+       printk("!!Get tagged addr!!");
+       printk("Get tagged addr: csr val %lx", r);
+       if (r & ENVCFG_PMEN)
                return PR_TAGGED_ADDR_ENABLE;
        return 0;
 }
