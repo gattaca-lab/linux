@@ -284,6 +284,11 @@ SYM_FUNC_START(__switch_to)
 	add   a3, a0, a4
 	add   a4, a1, a4
 	REG_S ra,  TASK_THREAD_RA_RA(a3)
+
+        /* store senvcfg */
+        csrr a5, CSR_SENVCFG
+        REG_S a5, TASK_THREAD_SENVCFG_RA(a3)
+
 	REG_S sp,  TASK_THREAD_SP_RA(a3)
 	REG_S s0,  TASK_THREAD_S0_RA(a3)
 	REG_S s1,  TASK_THREAD_S1_RA(a3)
@@ -299,6 +304,11 @@ SYM_FUNC_START(__switch_to)
 	REG_S s11, TASK_THREAD_S11_RA(a3)
 	/* Restore context from next->thread */
 	REG_L ra,  TASK_THREAD_RA_RA(a4)
+
+        /* load senvcfg */
+        REG_L a5, TASK_THREAD_SENVCFG_RA(a4)
+        csrw CSR_SENVCFG, a5
+
 	REG_L sp,  TASK_THREAD_SP_RA(a4)
 	REG_L s0,  TASK_THREAD_S0_RA(a4)
 	REG_L s1,  TASK_THREAD_S1_RA(a4)
